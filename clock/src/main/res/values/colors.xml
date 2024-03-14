@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="clock_background">#1F1F1F</color>
+    <color name="second_hand">#C26E0C</color>
+    <color name="minute_hand">#1F1F1F</color>
+    <color name="hour_hand">#1F1F1F</color>
+</resources>

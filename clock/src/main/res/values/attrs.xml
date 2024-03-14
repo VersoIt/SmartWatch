@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ClockView">
+        <attr name="android:textColor" format="color"/>
+        <attr name="colorContainer" format="color"/>
+        <attr name="android:background" format="reference"/>
+        <attr name="secondHandColor" format="color" />
+        <attr name="minuteHandColor" format="color" />
+        <attr name="hourHandColor" format="color" />
+    </declare-styleable>
+</resources>
