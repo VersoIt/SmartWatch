@@ -3,7 +3,7 @@
     <declare-styleable name="ClockView">
         <attr name="android:textColor" format="color"/>
         <attr name="colorContainer" format="color"/>
-        <attr name="android:background" format="reference"/>
+        <attr name="shape" format="reference"/>
         <attr name="secondHandColor" format="color" />
         <attr name="minuteHandColor" format="color" />
         <attr name="hourHandColor" format="color" />

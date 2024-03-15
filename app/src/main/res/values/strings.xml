@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">SmartWatch</string>
+    <string name="next">Далее</string>
+    <string name="close_app">Закрыть приложение</string>
+    <string name="numbers">Числа</string>
+    <string name="second_hand">Секундная стрелка</string>
+    <string name="minute_hand">Минутная стрелка</string>
+    <string name="hour_hand">Часовая стрелка</string>
+    <string name="circle">Круг</string>
+    <string name="shape">Форма</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add">Добавить</string>
+    <string name="resume">Продолжить</string>
+    <string name="pause">Пауза</string>
+    <string name="some_properties_set_from_xml">Некоторые свойства установлены через xml*</string>
 </resources>

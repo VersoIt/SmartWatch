@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".FirstFragment">
+
+        <ru.versoit.clock.ClockView
+            android:id="@+id/clock_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/next_button"
+            app:layout_constraintVertical_bias="0.4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <SeekBar
+            android:id="@+id/size_changer"
+            android:thumbTint="@color/black"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:layout_constraintBottom_toTopOf="@id/change_circle_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clock_view" />
+
+        <Button
+            android:id="@+id/change_numbers_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/size_changer"
+            app:layout_constraintEnd_toStartOf="@id/change_second_hand_color"
+            android:text="@string/numbers" />
+
+        <Button
+            android:id="@+id/change_second_hand_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/change_numbers_color"
+            app:layout_constraintTop_toBottomOf="@id/size_changer"
+            app:layout_constraintEnd_toStartOf="@id/change_circle_color"
+            android:text="@string/second_hand" />
+
+        <Button
+            android:id="@+id/change_circle_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/change_second_hand_color"
+            app:layout_constraintTop_toBottomOf="@id/size_changer"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/circle" />
+
+        <Button
+            android:id="@+id/change_minute_hand_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/change_second_hand_color"
+            app:layout_constraintEnd_toStartOf="@id/change_hour_hand_color"
+            android:text="@string/minute_hand" />
+
+        <Button
+            android:id="@+id/change_hour_hand_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/change_minute_hand_color"
+            app:layout_constraintTop_toBottomOf="@id/change_second_hand_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/hour_hand" />
+
+        <Button
+            android:id="@+id/change_shape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/change_hour_hand_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/shape" />
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="30dp"
+            android:text="@string/next"
+            app:layout_constraintTop_toBottomOf="@id/change_shape"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

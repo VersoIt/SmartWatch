@@ -7,8 +7,11 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import kotlin.math.cos
@@ -45,13 +48,24 @@ class ClockView @JvmOverloads constructor(
         val textPositionsOnCircle: List<Pair<Float, Float>> = emptyList(),
     )
 
+    @ColorInt
     var textColor: Int
+
+    @ColorInt
     var colorContainer: Int
+
+    @ColorInt
     var secondHandColor: Int
+
+    @ColorInt
     var minuteHandColor: Int
+
+    @ColorInt
     var hourHandColor: Int
 
-    var clockBackground: Drawable?
+    private var pausedTime: Long = 0
+
+    private var clockBackground: Drawable? = null
 
     private val minuteHandDrawable = AppCompatResources.getDrawable(context, R.drawable.minute_hand)
     private val hourHandDrawable = AppCompatResources.getDrawable(context, R.drawable.hour_hand)
@@ -65,17 +79,31 @@ class ClockView @JvmOverloads constructor(
         typeface = Typeface.DEFAULT_BOLD
     }
 
+    var paused: Boolean = false
+        set(pause) {
+            if (!paused && pause) {
+                pausedTime = getTimeInMillis()
+            } else if (paused && !pause) {
+                requestLayout()
+            }
+            field = pause
+        }
+
+    @DrawableRes
+    var clockShape: Int = R.drawable.clock_shape
+        set(value) {
+            clockBackground = ContextCompat.getDrawable(context, value)
+            field = value
+        }
+
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ClockView)
 
         textColor = typedArray.getColor(R.styleable.ClockView_android_textColor, Color.BLACK)
         colorContainer = typedArray.getColor(R.styleable.ClockView_colorContainer, Color.WHITE)
-        clockBackground = AppCompatResources.getDrawable(
-            context,
-            typedArray.getResourceId(
-                R.styleable.ClockView_android_background,
-                R.drawable.clock_background
-            )
+        clockShape = typedArray.getResourceId(
+            R.styleable.ClockView_shape,
+            R.drawable.clock_shape
         )
         secondHandColor = typedArray.getColor(
             R.styleable.ClockView_secondHandColor,
@@ -111,6 +139,7 @@ class ClockView @JvmOverloads constructor(
             textPositionsOnCircle = generateTextPositionsOnCircle(
                 centerX = centerX,
                 centerY = centerY,
+                paint = paint,
                 radius = clockFieldCenter.toInt().percent(90),
             )
         )
@@ -152,7 +181,38 @@ class ClockView @JvmOverloads constructor(
         drawMinuteHand(canvas, time)
         drawSecondHand(canvas, time)
 
-        invalidate()
+        if (!paused) {
+            invalidate()
+        }
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        val superState = super.onSaveInstanceState()
+        return ClockViewState(
+            superState = superState,
+            secondHandColor = secondHandColor,
+            minuteHandColor = minuteHandColor,
+            hourHandColor = hourHandColor,
+            textColor = textColor,
+            colorContainer = colorContainer,
+            clockShape = clockShape,
+            paused = paused,
+            pausedTime = pausedTime,
+        )
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is ClockViewState) {
+            secondHandColor = state.secondHandColor
+            minuteHandColor = state.minuteHandColor
+            hourHandColor = state.hourHandColor
+            textColor = state.textColor
+            colorContainer = state.colorContainer
+            clockShape = state.clockShape
+            paused = state.paused
+            pausedTime = state.pausedTime
+        }
+        super.onRestoreInstanceState(state)
     }
 
     private fun drawBackground(canvas: Canvas) {
@@ -179,8 +239,13 @@ class ClockView @JvmOverloads constructor(
     }
 
     private fun drawNumbers(canvas: Canvas, paint: Paint) {
+
+        if (cachedMeasurements.textPositionsOnCircle.size != PARTS_OF_CLOCK_AMOUNT) {
+            throw RuntimeException("Incorrect number of positions on the clock face")
+        }
+
         paint.color = textColor
-        for (index in 0..<PARTS_OF_CLOCK_AMOUNT) {
+        for (index in 0 until PARTS_OF_CLOCK_AMOUNT) {
             canvas.drawText(
                 "${index + 1}",
                 cachedMeasurements.textPositionsOnCircle[index].first,
@@ -250,7 +315,6 @@ class ClockView @JvmOverloads constructor(
         millisInOneCircle: Long,
         time: Long,
     ) {
-        paint.color = color
         drawHand(
             handDimensions.offsetRatio,
             handDimensions.widthRatio,
@@ -260,7 +324,7 @@ class ClockView @JvmOverloads constructor(
         ) { left, top, right, bottom, rotation ->
             canvas.save()
             canvas.rotate(rotation, cachedMeasurements.centerX, cachedMeasurements.centerY)
-            drawable?.setTint(minuteHandColor)
+            drawable?.setTint(color)
             drawable?.setBounds(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
             drawable?.draw(canvas)
             canvas.restore()
@@ -304,6 +368,7 @@ class ClockView @JvmOverloads constructor(
     private fun generateTextPositionsOnCircle(
         centerX: Float,
         centerY: Float,
+        paint: Paint,
         radius: Int,
     ): List<Pair<Float, Float>> {
         val positions = mutableListOf<Pair<Float, Float>>()
@@ -312,7 +377,7 @@ class ClockView @JvmOverloads constructor(
             val number = index.toString()
 
             val angle = angleIncrement * index - Math.PI / 2
-            val textHeight = getTextBounds(number).height()
+            val textHeight = getTextBounds(number, paint).height()
             val x = centerX + (radius - textHeight) * cos(angle).toFloat()
             val y = centerY + (radius - textHeight) * sin(angle).toFloat()
 
@@ -321,13 +386,17 @@ class ClockView @JvmOverloads constructor(
         return positions
     }
 
-    private fun getTextBounds(text: String): Rect {
+    private fun getTextBounds(text: String, paint: Paint): Rect {
         val bounds = Rect()
         paint.getTextBounds(text, 0, text.length, bounds)
         return bounds
     }
 
     private fun getTimeInMillis(): Long {
+        if (paused) {
+            return pausedTime
+        }
+
         return System.currentTimeMillis()
     }
 
@@ -353,7 +422,7 @@ class ClockView @JvmOverloads constructor(
         const val MINUTE_HAND_HEIGHT_RATIO = 0.052f
 
         const val HOUR_HAND_OFFSET_RATIO = 0.026f
-        const val HOUR_HAND_WIDTH_RATIO = 0.263f
+        const val HOUR_HAND_WIDTH_RATIO = 0.255f
         const val HOUR_HAND_HEIGHT_RATIO = 0.052f
     }
 }
