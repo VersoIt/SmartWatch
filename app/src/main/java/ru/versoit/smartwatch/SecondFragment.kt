@@ -15,6 +15,8 @@ class SecondFragment : Fragment() {
     private val binding: FragmentSecondBinding
         get() = _binding!!
 
+    private var count = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,6 +33,10 @@ class SecondFragment : Fragment() {
         }
 
         binding.addButton.setOnClickListener {
+            ++count
+            if (count >= 3) {
+                binding.addButton.isEnabled = false
+            }
             val clock = ClockView(requireContext())
             binding.clockContainer.addView(clock)
         }
